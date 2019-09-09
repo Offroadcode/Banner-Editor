@@ -1,4 +1,4 @@
-angular.module("umbraco").controller("text.over.image.editor.controller", function($scope, dialogService) {
+angular.module("umbraco").controller("orc.banner.editor.controller", function($scope, dialogService) {
 
 	// Initialization Methods ////////////////////////////////////////////////////
 
@@ -110,7 +110,7 @@ angular.module("umbraco").controller("text.over.image.editor.controller", functi
     * deleting the media item from the model's value.
 	*/
 	$scope.onRemoveImageConfirmation = function() {
-		$scope.model.value.media = new textOverImage.Models.Media();
+		$scope.model.value.media = new bannerEditor.Models.Media();
 	};
 
 	/**
@@ -301,15 +301,15 @@ angular.module("umbraco").controller("text.over.image.editor.controller", functi
 
     /**
     * @method getPropertyValue
-    * @returns {textOverImage.Models.TextOverImage}
+    * @returns {bannerEditor.Models.TextOverImage}
     * @description If the $scope.model.value already exists, filter it through 
     * the model and return it. Elsewise, create a new, default model.
     */
     $scope.getPropertyValue = function() {
-        var value = new textOverImage.Models.TextOverImage();
+        var value = new bannerEditor.Models.bannerEditor();
         if ($scope.model) {
             if ($scope.model.value != undefined) {
-                value = new textOverImage.Models.TextOverImage($scope.model.value);
+                value = new bannerEditor.Models.bannerEditor($scope.model.value);
             }
         }
         return value;

@@ -1,11 +1,11 @@
 {
 	propertyEditors: [{
 		name: "Banner Editor",
-		alias: "BannerEditor",
+		alias: "Orc.BannerEditor",
 		icon: "icon-billboard",
 		group: "media",
 		editor: {
-			view: "~/app_plugins/BannerEditor/views/TextOverImageEditorView.html",
+			view: "~/app_plugins/BannerEditor/views/BannerEditorView.html",
 			valueType: "JSON"
 		},
 		prevalues: {

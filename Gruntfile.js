@@ -46,11 +46,11 @@ module.exports = function(grunt) {
         },
         dist: {
           src: [
-              'BannerEditor/text.over.image.namespaces.js',
-              'BannerEditor/models/text.over.image.editor.models.js',
+              'BannerEditor/orc.banner.editor.namespaces.js',
+              'BannerEditor/models/orc.banner.editor.models.js',
               'BannerEditor/directives/contenteditable.directive.js',
               'BannerEditor/controllers/confirmation.dialog.controller.js',
-              'BannerEditor/controllers/text.over.image.editor.controller.js'
+              'BannerEditor/controllers/orc.banner.editor.controller.js'
           ],
           dest: '<%= basePath %>/js/BannerEditor.js'
         }
@@ -66,7 +66,7 @@ module.exports = function(grunt) {
           html: {
               cwd: 'BannerEditor/views/',
               src: [
-                  'TextOverImageEditorView.html',
+                  'BannerEditorView.html',
                   'ConfirmationDialogView.html'
               ],
               dest: '<%= basePath %>/views/',
@@ -155,8 +155,8 @@ module.exports = function(grunt) {
           'BannerEditor/models/*.js',
           'BannerEditor/directives/*.js',
           '!BannerEditor/controllers/confirmation.dialog.controller.js',
-          '!BannerEditor/controllers/text.over.image.editor.controller.js',
-          '!BannerEditor/models/text.over.image.editor.models.js',
+          '!BannerEditor/controllers/orc.banner.editor.controller.js',
+          '!BannerEditor/models/orc.banner.editor.models.js',
           '!BannerEditor/directives/contenteditable.directive.js'
         ],
         css: [

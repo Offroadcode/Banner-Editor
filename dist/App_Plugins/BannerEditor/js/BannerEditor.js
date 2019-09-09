@@ -1,12 +1,12 @@
-(function(textOverImage, undefined) {
+(function(bannerEditor, undefined) {
 
-    textOverImage.Constants = {};
-    textOverImage.Controllers = {};
-    textOverImage.Directives = {};
-    textOverImage.Models = {};
-    textOverImage.Services = {};
+    bannerEditor.Constants = {};
+    bannerEditor.Controllers = {};
+    bannerEditor.Directives = {};
+    bannerEditor.Models = {};
+    bannerEditor.Services = {};
 
-}(window.textOverImage = window.textOverImage || {}));
+}(window.bannerEditor = window.bannerEditor || {}));
 
 (function(models, undefined) {
 
@@ -14,19 +14,19 @@
 	* @class TextOverImage
 	* @this TextOverImage
 	* @param {JSON} data
-	* @param {textOverImage.Models.Media} data.media
+	* @param {bannerEditor.Models.Media} data.media
 	* @param {string} data.headline - A text headline that will overlap the image.
 	* @param {string} data.height - "short", "mid", or "tall"; class names for the height of the banner div.
 	* @param {string} data.subheadline - A text subheadline that will overlap the image.
 	* @param {string} data.position - tl, tc, tr, ml, mc, mr, bl, bm, br.
 	* @description Class defining a Text Over Image Editor, which displays a selectable image, headline, sub-headline, and text position.
 	*/
-	models.TextOverImage = function(data) {
+	models.BannerEditor = function(data) {
 		var self = this;
 		self.headline = "Headline";
 		self.height = "mid";
-		self.link = new textOverImage.Models.Link();
-		self.media = new textOverImage.Models.Media();
+		self.link = new bannerEditor.Models.Link();
+		self.media = new bannerEditor.Models.Media();
 		self.subheadline = "Sub-Headline";
 		self.position = "mc";
 		if (data !== undefined) {
@@ -37,10 +37,10 @@
 				self.height = data.height;
 			}
 			if (data.link !== undefined) {
-				self.link = new textOverImage.Models.Link(data.link);
+				self.link = new bannerEditor.Models.Link(data.link);
 			}
 			if (data.media !== undefined) {
-				self.media = new textOverImage.Models.Media(data.media);
+				self.media = new bannerEditor.Models.Media(data.media);
 			}
 			if (data.subheadline !== undefined) {
 				self.subheadline = data.subheadline;
@@ -117,7 +117,7 @@
 		}
 	}
 
-}(window.textOverImage.Models = window.textOverImage.Models || {}));
+}(window.bannerEditor.Models = window.bannerEditor.Models || {}));
 
 angular.module("umbraco").directive("contenteditable", function() {
   return {
@@ -149,7 +149,7 @@ angular.module('umbraco').controller('confirmation.dialog.controller',
     	}
     });
 
-angular.module("umbraco").controller("text.over.image.editor.controller", function($scope, dialogService) {
+angular.module("umbraco").controller("orc.banner.editor.controller", function($scope, dialogService) {
 
 	// Initialization Methods ////////////////////////////////////////////////////
 
@@ -261,7 +261,7 @@ angular.module("umbraco").controller("text.over.image.editor.controller", functi
     * deleting the media item from the model's value.
 	*/
 	$scope.onRemoveImageConfirmation = function() {
-		$scope.model.value.media = new textOverImage.Models.Media();
+		$scope.model.value.media = new bannerEditor.Models.Media();
 	};
 
 	/**
@@ -452,15 +452,15 @@ angular.module("umbraco").controller("text.over.image.editor.controller", functi
 
     /**
     * @method getPropertyValue
-    * @returns {textOverImage.Models.TextOverImage}
+    * @returns {bannerEditor.Models.TextOverImage}
     * @description If the $scope.model.value already exists, filter it through 
     * the model and return it. Elsewise, create a new, default model.
     */
     $scope.getPropertyValue = function() {
-        var value = new textOverImage.Models.TextOverImage();
+        var value = new bannerEditor.Models.bannerEditor();
         if ($scope.model) {
             if ($scope.model.value != undefined) {
-                value = new textOverImage.Models.TextOverImage($scope.model.value);
+                value = new bannerEditor.Models.bannerEditor($scope.model.value);
             }
         }
         return value;
