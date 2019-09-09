@@ -58,7 +58,7 @@ module.exports = function(grunt) {
   
       copy: {
           dll: {
-              cwd: 'BannerEditor/Umbraco/BannerEditor/bin/debug/',
+              cwd: 'BannerEditor/Orc.BannerEditor/bin/debug/',
               src: 'BannerEditor.dll',
               dest: '<%= dest %>/bin/',
               expand: true
@@ -78,7 +78,7 @@ module.exports = function(grunt) {
           css: {
               cwd: 'BannerEditor/css/',
               src: [
-                  'BannerEditor.css'
+                  'style.css'
               ],
               dest: '<%= basePath %>/css/',
               expand: true,
@@ -138,7 +138,7 @@ module.exports = function(grunt) {
                   style: 'compressed'
               },
               files: {
-                  'BannerEditor/css/BannerEditor.css': 'BannerEditor/sass/BannerEditor.scss'
+                  'BannerEditor/css/style.css': 'BannerEditor/sass/style.scss'
               }
           }
       },
@@ -147,8 +147,8 @@ module.exports = function(grunt) {
         build: '<%= grunt.config("basePath").substring(0, 4) == "dist" ? "dist/**/*" : "null" %>',
         tmp: ['tmp'],
         html: [
-          'TextOverImageEditor/views/*.html',
-          '!TextOverImageEditor/views/TextOverImageEditorView.html'
+          'BannerEditor/views/*.html',
+          '!BannerEditor/views/TextOverImageEditorView.html'
           ],
         js: [
           'BannerEditor/controllers/*.js',
@@ -161,16 +161,16 @@ module.exports = function(grunt) {
         ],
         css: [
           'BannerEditor/css/*.css',
-          '!BannerEditor/css/textOverImage.css'
+          '!BannerEditor/css/style.css'
         ],
         sass: [
           'BannerEditor/sass/*.scss',
-          '!BannerEditor/sass/textOverImage.scss'
+          '!BannerEditor/sass/style.scss'
         ]
     }
     });
   
-    grunt.registerTask('default', ['concat', 'sass:dist', 'copy:html', 'copy:manifest', 'copy:css', 'msbuild:dist', 'copy:dll', 'clean:html', 'clean:js', 'clean:sass', 'clean:css']);
+    grunt.registerTask('default', ['concat', 'sass:dist', 'copy:html', 'copy:manifest', 'copy:css', 'copy:dll', 'clean:html', 'clean:js', 'clean:sass', 'clean:css']);
     grunt.registerTask('umbraco', ['clean:tmp', 'default', 'copy:umbraco', 'umbracoPackage', 'clean:tmp']);
   };
   
