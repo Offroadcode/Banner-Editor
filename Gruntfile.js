@@ -75,6 +75,17 @@ module.exports = function(grunt) {
                   return dest + src;
                 }
           },
+          cshtml: {
+            cwd: 'BannerEditor/PartialViews',
+            src: [
+              'OrcBannerEditorExample.cshtml',
+            ],
+            dest: '<%= dest %>/Views/Partials/',
+            expand: true,
+            rename: function(dest,src){
+              return dest + src;
+            }
+          },
           css: {
               cwd: 'BannerEditor/css/',
               src: [
@@ -166,11 +177,15 @@ module.exports = function(grunt) {
         sass: [
           'BannerEditor/sass/*.scss',
           '!BannerEditor/sass/style.scss'
+        ],
+        cshtml: [
+          'BannerEditor/PartialViews/*.cshtml',
+          '!BannerEditor/PartialViews/OrcBannerEditorExample.cshtml'
         ]
     }
     });
   
-    grunt.registerTask('default', ['concat', 'sass:dist', 'copy:html', 'copy:manifest', 'copy:css', 'copy:dll', 'clean:html', 'clean:js', 'clean:sass', 'clean:css']);
+    grunt.registerTask('default', ['concat', 'sass:dist', 'copy:html', 'copy:manifest', 'copy:css', 'copy:dll', 'clean:html', 'clean:js', 'clean:sass', 'clean:css', 'clean:cshtml']);
     grunt.registerTask('umbraco', ['clean:tmp', 'default', 'copy:umbraco', 'umbracoPackage', 'clean:tmp']);
   };
   
