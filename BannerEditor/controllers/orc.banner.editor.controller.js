@@ -8,6 +8,7 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     * initialization functions.
 	*/
 	$scope.init = function() {
+        console.info($scope.model);
         $scope.setVariables();
 	};
 
@@ -57,6 +58,44 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
 		}
 		$scope.toggleMode('edit');
     };
+
+    $scope.createColorPicker = function(key) {
+        var currentColor = $scope.model.value[key];
+        var pickr = Pickr.create({
+            default: !!currentColor ? 'rgba(' + currentColor + ')' : 'rgba(48,48,51,1)',
+            el: '.pickr-container-' + key,
+            theme: 'nano',
+            swatches: [],
+            defaultRepresentation: 'HEXA',
+            components: {
+                preview: true,
+                opacity: true,
+                hue: true,
+
+                interaction: {
+                    hex: false,
+                    rgba: false,
+                    hsva: false,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+        pickr.on('save', function(color, instance) {
+            var newColor = '';
+            if (!!color) {
+                newColor = color.toRGBA().join(',');
+            }
+            $scope.$apply(function() {
+                $scope.model.value[key] = newColor;
+                console.info($scope.model.value);
+            });
+        });
+        if (key == "overlayColor") {
+            $scope.overlayPicker = pickr;
+        }
+    };    
     
     $scope.deleteLink = function() {
         $scope.model.value.link.id = ''; 
@@ -71,21 +110,29 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     * @description Event handler triggered by a media picker dialog. If there is 
     * an image selected, updates the $scope.model.value with the image's information.
     */
-    $scope.handleMediaPickerSelection = function(data) {
-        if (data && data.id && !data.isFolder && data.image) {
-            $scope.model.value.media.id = data.id;
-            $scope.model.value.media.url = data.image;
-            $scope.model.value.media.width = data.originalWidth;
-            $scope.model.value.media.height = data.originalHeight;
-            $scope.model.value.media.altText = data.name;
+    $scope.handleMediaPickerSelection = function(data, index) {
+        if (data && data.id && !!data.image) {
+            var media = $scope.getMediaClone($scope.model.value.media);
+            media[index].id = data.id;
+            media[index].url = data.image;
+            media[index].width = data.originalWidth;
+            media[index].height = data.originalHeight;
+            media[index].altText = data.name;
             $scope.shouldShowBannerWithoutImage = true;
-            data.properties.forEach(function(property){
-                if(property.alias == "altText") {
-                    if(property.value != "") {
-                        $scope.model.value.media.altText = property.value;
+            if (data.properties) {
+                data.properties.forEach(function(property) {
+                    if(property.alias == "altText") {
+                        if(property.value != "") {
+                            media[0].altText = property.value;
+                        }
                     }
+                });
+            } else if (!!data.metaData) {
+                if (!!data.metaData.Text) {
+                    media[index].altText = data.metaData.Text;
                 }
-            });
+            }
+            $scope.model.value.media = media;
         }
     };
 
@@ -109,35 +156,48 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     * @description Handles callback from remove image confirmation dialog, 
     * deleting the media item from the model's value.
 	*/
-	$scope.onRemoveImageConfirmation = function() {
-		$scope.model.value.media = new bannerEditor.Models.Media();
-	};
-
+	$scope.onRemoveImageConfirmation = function(index) {
+        var media = $scope.getMediaClone($scope.model.value.media);
+        var key = "desktop";
+        switch (index) {
+            case 1:
+                key = "tablet";
+            case 2:
+                key = "mobile";
+        }
+        media[index] = new bannerEditor.Models.MediaItem({key: key});
+		$scope.model.value.media = media;
+    };
+    
 	/**
 	* @method openConfirmRemoveDialog
     * @description Using Umbraco's dialogService, opens confirmation dialog, 
     * asking user to confirm they want to remove the image from the banner. Dialog 
     * result is passed to $scope.onRemoveImageConfirmation
 	*/
-	$scope.openConfirmRemoveDialog = function() {
-		dialogService.open({
-			template: "/App_plugins/TextOverImageEditor/views/ConfirmationDialogView.html",
+	$scope.openConfirmRemoveDialog = function(index) {
+        dialogService.open({
+			template: "/App_plugins/BannerEditor/views/ConfirmationDialogView.html",
 			dialogData: {
-				message: "Are you sure you want to remove the image from the banner?"
+                message: "Are you sure you want to remove the selected image?"
 			},
-			callback: $scope.onRemoveImageConfirmation
-		});
-	};
+			callback: function() {
+                $scope.onRemoveImageConfirmation(index);
+            }
+        });
+    };
 
     /**
     * @method openMediaPicker
     * @description Opens the media picker dialog, showing only images, and sends 
     * the data returned to $scope.handleMediaPickerSelection.
     */
-    $scope.openMediaPicker = function() {
+    $scope.openMediaPicker = function(index) {
         var options = {
             onlyImages: true,
-            callback: $scope.handleMediaPickerSelection
+            callback: function(data) {
+                $scope.handleMediaPickerSelection(data, index);
+            }
         };
         dialogService.mediaPicker(options);
     };
@@ -156,13 +216,17 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
              // as content causing error
             id: $scope.model.value.link.isMedia ? null : $scope.model.value.link.id
         }
-
         dialogService.linkPicker({
             currentTarget: link,
             callback: $scope.handleLinkPickerSelection
         });
-        dialogService.closeAll();
     };
+
+    $scope.openOverlayPicker = function() {
+        if ($scope.overlayPicker) {
+            $scope.overlayPicker.show();
+        }
+    }
 
     /**
      * @method renderAddLinkText
@@ -214,34 +278,44 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
             width: "800px",
             height: "400px",
             background: "#333"
-        }
-        if ($scope.model.value.media && $scope.model.value.media.url !== "") {
-            var media = $scope.model.value.media;
-            width = media.width;
-            height = media.height;
+        };
+        var media = $scope.getMediaClone($scope.model.value.media);
+        var mediaItem = media[0];
+
+        if (mediaItem.url !== "") {
+            // 1. Get natural dimensions
+            var sizer = document.querySelector('.orc-be-media-item-sizer-' + mediaItem.id);
+            width = !!sizer ? sizer.naturalWidth : mediaItem.width;
+            height = !!sizer ? sizer.naturalHeight : mediaItem.height;
             var ratio = height / width;
+
+            // 2. Adjust for selected height type.
+            switch ($scope.model.value.height) {
+                case "short":
+                    height = 200;
+                    break;
+                case "mid":
+                    height = 400;
+                    break;
+                case "tall":
+                    height = 600;
+                    break;
+            }
+            width = height / ratio; 
+
+            // 3. Fix if too wide for container.
             if (width > $scope.maxWidth) {
                 width = $scope.maxWidth;
                 height = ratio * width;
             }
+
             styles = {
                 width: width + "px",
                 height: height + "px",
-                background: "url(" + media.url + ") center center no-repeat",
+                background: "url(" + mediaItem.url + ") center center no-repeat",
                 'background-size': "cover"
             };
         }
-		switch ($scope.model.value.height) {
-			case "short":
-				styles.height = "200px";
-				break;
-			case "mid":
-				styles.height = "400px";
-				break;
-			case "tall":
-				styles.height = "600px";
-				break;
-		}
         return styles;
     };
 
@@ -255,9 +329,10 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
 			width: "800px"
 		}
 		if ($scope.model.value.media) {
-		    var media = $scope.model.value.media;
-            if (media.width > 0) {
-                width = media.width;
+		    var media = $scope.getMediaClone($scope.model.value.media);
+            if (media[0].width > 0) {
+                var sizer = document.querySelector('.orc-be-media-item-sizer-' + media[0].id);
+                width = !!sizer ? sizer.naturalWidth : media[0].width;
                 if (width > $scope.maxWidth && $scope.maxWidth > 0) {
                     width = $scope.maxWidth;
                 }
@@ -299,17 +374,25 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
         return value;
     };
 
+    $scope.getMediaClone = function(media) {
+        return [
+            new bannerEditor.Models.MediaItem(media[0]),
+            new bannerEditor.Models.MediaItem(media[1]),
+            new bannerEditor.Models.MediaItem(media[2])
+        ];
+    }
+
     /**
     * @method getPropertyValue
-    * @returns {bannerEditor.Models.TextOverImage}
+    * @returns {bannerEditor.Models.BannerEditor}
     * @description If the $scope.model.value already exists, filter it through 
     * the model and return it. Elsewise, create a new, default model.
     */
     $scope.getPropertyValue = function() {
-        var value = new bannerEditor.Models.bannerEditor();
+        var value = new bannerEditor.Models.BannerEditor();
         if ($scope.model) {
             if ($scope.model.value != undefined) {
-                value = new bannerEditor.Models.bannerEditor($scope.model.value);
+                value = new bannerEditor.Models.BannerEditor($scope.model.value);
             }
         }
         return value;
@@ -324,7 +407,8 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     $scope.hasImageSelected = function() {
         var hasImageSelected = false;
         if (($scope.model && $scope.model.value)) {
-            if ($scope.model.value.media.id != 0) {
+            var mediaItem = new bannerEditor.Models.MediaItem($scope.model.value.media[0]);
+            if (mediaItem.id != 0) {
                 hasImageSelected = true;
             }
 			if (($scope.model.value.headline !== "" && $scope.model.value.headline !== "Headline") || ($scope.model.value.subheadline !== "" && $scope.model.value.subheadline !== "Sub-Headline")) {

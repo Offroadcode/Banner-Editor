@@ -46,6 +46,7 @@ module.exports = function(grunt) {
         },
         dist: {
           src: [
+              'BannerEditor/libs/pickr.min.js',
               'BannerEditor/orc.banner.editor.namespaces.js',
               'BannerEditor/models/orc.banner.editor.models.js',
               'BannerEditor/directives/contenteditable.directive.js',
@@ -78,7 +79,7 @@ module.exports = function(grunt) {
           css: {
               cwd: 'BannerEditor/css/',
               src: [
-                  'style.css'
+                  'BannerEditor.css'
               ],
               dest: '<%= basePath %>/css/',
               expand: true,
@@ -138,7 +139,7 @@ module.exports = function(grunt) {
                   style: 'compressed'
               },
               files: {
-                  'BannerEditor/css/style.css': 'BannerEditor/sass/style.scss'
+                  'BannerEditor/css/BannerEditor.css': 'BannerEditor/sass/style.scss'
               }
           }
       },
@@ -148,12 +149,15 @@ module.exports = function(grunt) {
         tmp: ['tmp'],
         html: [
           'BannerEditor/views/*.html',
-          '!BannerEditor/views/TextOverImageEditorView.html'
+          '!BannerEditor/views/BannerEditorView.html',
+          '!BannerEditor/views/ConfirmationDialogView.html'
           ],
         js: [
           'BannerEditor/controllers/*.js',
           'BannerEditor/models/*.js',
           'BannerEditor/directives/*.js',
+          'BannerEditor/libs/*.js',
+          '!BannerEditor/libs/pickr.min.js',
           '!BannerEditor/controllers/confirmation.dialog.controller.js',
           '!BannerEditor/controllers/orc.banner.editor.controller.js',
           '!BannerEditor/models/orc.banner.editor.models.js',
@@ -161,7 +165,7 @@ module.exports = function(grunt) {
         ],
         css: [
           'BannerEditor/css/*.css',
-          '!BannerEditor/css/style.css'
+          '!BannerEditor/css/BannerEditor.css'
         ],
         sass: [
           'BannerEditor/sass/*.scss',

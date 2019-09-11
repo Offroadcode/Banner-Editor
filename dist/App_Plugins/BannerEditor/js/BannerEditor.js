@@ -14,80 +14,75 @@
 	* @class TextOverImage
 	* @this TextOverImage
 	* @param {JSON} data
-	* @param {bannerEditor.Models.Media} data.media
-	* @param {string} data.headline - A text headline that will overlap the image.
-	* @param {string} data.height - "short", "mid", or "tall"; class names for the height of the banner div.
-	* @param {string} data.subheadline - A text subheadline that will overlap the image.
+	* @param {bannerEditor.Models.MediaItem[]} data.media
+    * @param {string} data.headline - A text headline that will overlap the 
+    * image.
+    * @param {string} data.height - "short", "mid", or "tall"; class names for 
+    * the height of the banner div.
+    * @param {string} data.subheadline - A text subheadline that will overlap 
+    * the image.
 	* @param {string} data.position - tl, tc, tr, ml, mc, mr, bl, bm, br.
-	* @description Class defining a Text Over Image Editor, which displays a selectable image, headline, sub-headline, and text position.
+    * @description Class defining a Text Over Image Editor, which displays a 
+    * selectable image, headline, sub-headline, and text position.
 	*/
 	models.BannerEditor = function(data) {
 		var self = this;
-		self.headline = "Headline";
+        self.headline = "Headline";
+        self.headlineColor = "";
 		self.height = "mid";
-		self.link = new bannerEditor.Models.Link();
-		self.media = new bannerEditor.Models.Media();
-		self.subheadline = "Sub-Headline";
-		self.position = "mc";
+        self.link = new bannerEditor.Models.Link();
+        self.linkColor = "";
+        self.media = [
+            new bannerEditor.Models.MediaItem({key: "desktop"}),
+            new bannerEditor.Models.MediaItem({key: "tablet"}),
+            new bannerEditor.Models.MediaItem({key: "mobile"})
+        ];
+        self.overlayColor = "";
+        self.position = "mc";
+        self.subheadline = "Sub-Headline";
+        self.subheadlineColor = "";
+        self.video = new bannerEditor.Models.Video();
 		if (data !== undefined) {
 			if (data.headline !== undefined) {
 				self.headline = data.headline;
-			}
+            }
+            if (data.headlineColor !== undefined) {
+                self.headlineColor = data.headlineColor;
+            }
 			if (data.height !== undefined) {
 				self.height = data.height;
 			}
 			if (data.link !== undefined) {
 				self.link = new bannerEditor.Models.Link(data.link);
-			}
+            }
+            if (data.linkColor !== undefined) {
+                self.linkColor = data.linkColor;
+            }
 			if (data.media !== undefined) {
-				self.media = new bannerEditor.Models.Media(data.media);
-			}
-			if (data.subheadline !== undefined) {
-				self.subheadline = data.subheadline;
-			}
+				self.media = [
+                    new bannerEditor.Models.MediaItem(data.media[0]),
+                    new bannerEditor.Models.MediaItem(data.media[1]),
+                    new bannerEditor.Models.MediaItem(data.media[2])
+                ];
+            }
+            if (data.overlayColor !== undefined) {
+                self.overlayColor = data.overlayColor;
+            }
 			if (data.position !== undefined) {
 				self.position = data.position;
-			}
+            }
+            if (data.subheadline !== undefined) {
+				self.subheadline = data.subheadline;
+            }
+            if (data.subheadlineColor !== undefined) {
+                self.subheadlineColor = data.subheadlineColor;
+            }
+            if (data.video !== undefined) {
+                self.video = new bannerEditor.Models.Video(data.video);
+            }
 		}
-	};
-
-	/**
-	* @class Media
-	* @this Media
-	* @param {JSON} data
-	* @param {integer} data.id
-	* @param {string} data.url
-	* @param {integer} data.width
-	* @param {integer} data.height
-	* @param {string} data.altText
-	* @description Class definining a media object for the text over image.
-	*/
-	models.Media = function(data) {
-		var self = this;
-		self.id = 0;
-		self.url = "";
-		self.width = 0;
-		self.height = 0;
-		self.altText = "";
-		if (data !== undefined) {
-			if (data.id !== undefined) {
-				self.id = data.id;
-			}
-			if (data.url !== undefined) {
-				self.url = data.url;
-			}
-			if (data.width !== undefined) {
-				self.width = data.width;
-			}
-			if (data.height !== undefined) {
-				self.height = data.height;
-			}
-			if (data.altText !== undefined) {
-				self.altText = data.altText;
-			}
-		}
-	};
-
+    };
+    
 	/**
 	 * @class Link
 	 * @this Link
@@ -115,7 +110,70 @@
 				self.url = data.url;
 			}
 		}
-	}
+    };
+
+	/**
+	* @class MediaItem
+	* @this Media
+	* @param {JSON} data
+	* @param {integer} data.id
+	* @param {string} data.url
+	* @param {integer} data.width
+	* @param {integer} data.height
+	* @param {string} data.altText
+	* @description Class definining a media object for the text over image.
+	*/
+	models.MediaItem = function(data) {
+		var self = this;
+		self.altText = "";
+        self.height = 0;
+		self.id = 0;
+        self.key = "";
+		self.url = "";
+		self.width = 0;
+		if (data !== undefined) {
+			if (data.altText !== undefined) {
+				self.altText = data.altText;
+			}
+			if (data.height !== undefined) {
+				self.height = data.height;
+            }
+			if (data.id !== undefined) {
+				self.id = data.id;
+            }
+            if (data.key !== undefined) {
+                self.key = data.key;
+            }
+			if (data.url !== undefined) {
+				self.url = data.url;
+			}
+			if (data.width !== undefined) {
+				self.width = data.width;
+			}
+		}
+	};
+    
+    /**
+     * @class Video
+     * @this Video
+     */
+    models.Video = function(data) {
+        var self = this;
+        self.id = 0;
+        self.name = "";
+        self.url = "";
+        if (data !== undefined) {
+            if (data.id !== undefined) {
+                self.id = data.id;
+            }
+            if (data.name !== undefined) {
+                self.name = data.name;
+            }
+            if (data.url !== undefined) {
+                self.url = data.url;
+            }
+        }
+    };
 
 }(window.bannerEditor.Models = window.bannerEditor.Models || {}));
 
@@ -222,21 +280,29 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     * @description Event handler triggered by a media picker dialog. If there is 
     * an image selected, updates the $scope.model.value with the image's information.
     */
-    $scope.handleMediaPickerSelection = function(data) {
-        if (data && data.id && !data.isFolder && data.image) {
-            $scope.model.value.media.id = data.id;
-            $scope.model.value.media.url = data.image;
-            $scope.model.value.media.width = data.originalWidth;
-            $scope.model.value.media.height = data.originalHeight;
-            $scope.model.value.media.altText = data.name;
+    $scope.handleMediaPickerSelection = function(data, index) {
+        if (data && data.id && !!data.image) {
+            var media = $scope.getMediaClone($scope.model.value.media);
+            media[index].id = data.id;
+            media[index].url = data.image;
+            media[index].width = data.originalWidth;
+            media[index].height = data.originalHeight;
+            media[index].altText = data.name;
             $scope.shouldShowBannerWithoutImage = true;
-            data.properties.forEach(function(property){
-                if(property.alias == "altText") {
-                    if(property.value != "") {
-                        $scope.model.value.media.altText = property.value;
+            if (data.properties) {
+                data.properties.forEach(function(property) {
+                    if(property.alias == "altText") {
+                        if(property.value != "") {
+                            media[0].altText = property.value;
+                        }
                     }
+                });
+            } else if (!!data.metaData) {
+                if (!!data.metaData.Text) {
+                    media[index].altText = data.metaData.Text;
                 }
-            });
+            }
+            $scope.model.value.media = media;
         }
     };
 
@@ -261,7 +327,9 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     * deleting the media item from the model's value.
 	*/
 	$scope.onRemoveImageConfirmation = function() {
-		$scope.model.value.media = new bannerEditor.Models.Media();
+        var media = $scope.getMediaClone($scope.model.value.media);
+        media[0] = new bannerEditor.Models.MediaItem({key: "desktop"});
+		$scope.model.value.media = media;
 	};
 
 	/**
@@ -285,10 +353,12 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     * @description Opens the media picker dialog, showing only images, and sends 
     * the data returned to $scope.handleMediaPickerSelection.
     */
-    $scope.openMediaPicker = function() {
+    $scope.openMediaPicker = function(index) {
         var options = {
             onlyImages: true,
-            callback: $scope.handleMediaPickerSelection
+            callback: function(data) {
+                $scope.handleMediaPickerSelection(data, index);
+            }
         };
         dialogService.mediaPicker(options);
     };
@@ -307,7 +377,6 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
              // as content causing error
             id: $scope.model.value.link.isMedia ? null : $scope.model.value.link.id
         }
-
         dialogService.linkPicker({
             currentTarget: link,
             callback: $scope.handleLinkPickerSelection
@@ -365,34 +434,44 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
             width: "800px",
             height: "400px",
             background: "#333"
-        }
-        if ($scope.model.value.media && $scope.model.value.media.url !== "") {
-            var media = $scope.model.value.media;
-            width = media.width;
-            height = media.height;
+        };
+        var media = $scope.getMediaClone($scope.model.value.media);
+        var mediaItem = media[0];
+
+        if (mediaItem.url !== "") {
+            // 1. Get natural dimensions
+            var sizer = document.querySelector('.orc-be-media-item-sizer-' + mediaItem.id);
+            width = !!sizer ? sizer.naturalWidth : mediaItem.width;
+            height = !!sizer ? sizer.naturalHeight : mediaItem.height;
             var ratio = height / width;
+
+            // 2. Adjust for selected height type.
+            switch ($scope.model.value.height) {
+                case "short":
+                    height = 200;
+                    break;
+                case "mid":
+                    height = 400;
+                    break;
+                case "tall":
+                    height = 600;
+                    break;
+            }
+            width = height / ratio; 
+
+            // 3. Fix if too wide for container.
             if (width > $scope.maxWidth) {
                 width = $scope.maxWidth;
                 height = ratio * width;
             }
+
             styles = {
                 width: width + "px",
                 height: height + "px",
-                background: "url(" + media.url + ") center center no-repeat",
+                background: "url(" + mediaItem.url + ") center center no-repeat",
                 'background-size': "cover"
             };
         }
-		switch ($scope.model.value.height) {
-			case "short":
-				styles.height = "200px";
-				break;
-			case "mid":
-				styles.height = "400px";
-				break;
-			case "tall":
-				styles.height = "600px";
-				break;
-		}
         return styles;
     };
 
@@ -406,9 +485,10 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
 			width: "800px"
 		}
 		if ($scope.model.value.media) {
-		    var media = $scope.model.value.media;
-            if (media.width > 0) {
-                width = media.width;
+		    var media = $scope.getMediaClone($scope.model.value.media);
+            if (media[0].width > 0) {
+                var sizer = document.querySelector('.orc-be-media-item-sizer-' + media[0].id);
+                width = !!sizer ? sizer.naturalWidth : media[0].width;
                 if (width > $scope.maxWidth && $scope.maxWidth > 0) {
                     width = $scope.maxWidth;
                 }
@@ -450,17 +530,25 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
         return value;
     };
 
+    $scope.getMediaClone = function(media) {
+        return [
+            new bannerEditor.Models.MediaItem(media[0]),
+            new bannerEditor.Models.MediaItem(media[1]),
+            new bannerEditor.Models.MediaItem(media[2])
+        ];
+    }
+
     /**
     * @method getPropertyValue
-    * @returns {bannerEditor.Models.TextOverImage}
+    * @returns {bannerEditor.Models.BannerEditor}
     * @description If the $scope.model.value already exists, filter it through 
     * the model and return it. Elsewise, create a new, default model.
     */
     $scope.getPropertyValue = function() {
-        var value = new bannerEditor.Models.bannerEditor();
+        var value = new bannerEditor.Models.BannerEditor();
         if ($scope.model) {
             if ($scope.model.value != undefined) {
-                value = new bannerEditor.Models.bannerEditor($scope.model.value);
+                value = new bannerEditor.Models.BannerEditor($scope.model.value);
             }
         }
         return value;
@@ -475,7 +563,8 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     $scope.hasImageSelected = function() {
         var hasImageSelected = false;
         if (($scope.model && $scope.model.value)) {
-            if ($scope.model.value.media.id != 0) {
+            var mediaItem = new bannerEditor.Models.MediaItem($scope.model.value.media[0]);
+            if (mediaItem.id != 0) {
                 hasImageSelected = true;
             }
 			if (($scope.model.value.headline !== "" && $scope.model.value.headline !== "Headline") || ($scope.model.value.subheadline !== "" && $scope.model.value.subheadline !== "Sub-Headline")) {

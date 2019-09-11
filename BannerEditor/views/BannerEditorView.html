@@ -1,0 +1,105 @@
+<!-- orc-banner-editor -->
+<div 
+    ng-controller="orc.banner.editor.controller" 
+    class="text-over-image orc-be orc-be-{{model.alias}}" 
+>
+    <div ng-if="!hasImageSelected()">
+        <button ng-click="openMediaPicker(0)" type="button" class="btn">Select Image</button> or <button type="button" class="btn" ng-click="showBannerWithoutImage()">Add Text</button>
+    </div>
+    <!-- row -->
+    <div class="orc-be-row">
+        <!-- col -->
+        <div class="image orc-be-col orc-be-col-main" ng-class="getImageWrapperClasses()" ng-if="hasImageSelected()" ng-style="getBackgroundStyle()">
+            <div class="color-overlay-preview" style="background: rgba({{model.value.overlayColor}})">
+                <div class="overlay pos-{{model.value.position}}">
+                        <div class="headline-wrapper">
+                            <h1 contenteditable="true" ng-model="model.value.headline">{{model.value.headline}}</h1>
+                            <div class="pickr-container-headlineColor" ng-init="createColorPicker('headlineColor')"></div>
+                        </div>
+                        <div ng-if="model.config.showSubHeadline" class="subheadline-wrapper"> 
+                            <p contenteditable="true" ng-model="model.value.subheadline">{{model.value.subheadline}}</p>
+                            <div class="pickr-container-subheadlineColor" ng-init="createColorPicker('subheadlineColor')"></div>
+                        </div>
+                        <div ng-if="model.config.showLink" class="link-wrapper">
+                            <br/>
+                            <div class="pickr-container-linkColor" ng-init="createColorPicker('linkColor')"></div>
+                            <button ng-click="openLinkPicker()" type="button" class="btn btn-inline">{{renderAddLinkText()}}</button>
+                            <span ng-show="hasLinkSelected()">
+                                <button ng-click="deleteLink()" type="button" class="btn btn-inline btn-danger">X</button>
+                            </span>
+                        </div>
+                        <img 
+                            class="orc-be-media-item-sizer-{{model.value.media[0].id}}"
+                            ng-if="hasImageSelected()" 
+                            src={{model.value.media[0].url}} 
+                            style="height: 0; width: 0; opacity: 0;"
+                        />
+                    </div>
+            </div>
+            <div class="drop-grid">
+                <button type="button" class="grid-tl" ng-click="changePos('tl')"></button>
+                <button type="button" class="grid-tc" ng-click="changePos('tc')"></button>
+                <button type="button" class="grid-tr" ng-click="changePos('tr')"></button>
+                <button type="button" class="grid-ml" ng-click="changePos('ml')"></button>
+                <button type="button" class="grid-mc" ng-click="changePos('mc')"></button>
+                <button type="button" class="grid-mr" ng-click="changePos('mr')"></button>
+                <button type="button" class="grid-bl" ng-click="changePos('bl')"></button>
+                <button type="button" class="grid-bc" ng-click="changePos('bc')"></button>
+                <button type="button" class="grid-br" ng-click="changePos('br')"></button>
+            </div>
+            <div class="settings">
+                <button type="button" class="btn btn-small" title="Overlay Color" ng-click="openOverlayPicker()"><i class="icon-brush"></i></button>
+                <button type="button" class="btn btn-small" title="Resize: Medium, Tall, or Short" ng-click="changeHeight()"><i class="icon-navigation-vertical"></i></button>
+                <button type="button" class="btn btn-small" ng-click="toggleMode()" title="Position your text"><i class="icon-thumbnails-small"></i></button>
+                <button type="button" class="btn btn-small" ng-click="openMediaPicker()" title="Select an image"><i class="icon-umb-media"></i></button>
+                <button type="button" class="btn btn-small btn-danger" title="Delete the banner" ng-show="hasImageSelected()" ng-click="openConfirmRemoveDialog(0)"><i class="icon-trash"></i></button>
+            </div>
+            <div class="overlay-picker-wrapper">
+                <div class="pickr-container-overlayColor" ng-init="createColorPicker('overlayColor')"></div>            
+            </div>
+        </div>
+        <!-- end col -->
+        <!-- col -->
+        <div class="orc-be-col orc-be-col-sidebar" ng-if="hasImageSelected()">
+            <div class="preview size-mobile">
+                <h3>Mobile
+                    <button 
+                        type="button" 
+                        class="btn btn-small btn-danger" 
+                        title="Delete the banner" 
+                        ng-if="!!model.value.media[2].url" 
+                        ng-click="openConfirmRemoveDialog(2)"
+                    ><i class="icon-trash"></i></button>
+                </h3>
+                <a
+                    class="thumbnail-link" 
+                    ng-click="openMediaPicker(2)"
+                >
+                    <img ng-if="!!model.value.media[2].url" class="orc-be-thumbnail" src={{model.value.media[2].url}} />
+                    <i class="icon-add" ng-if="!model.value.media[2].url"></i>
+                </a>
+            </div>
+            <div class="preview size-tablet">
+                <h3>Tablet
+                    <button 
+                        type="button" 
+                        class="btn btn-small btn-danger" 
+                        title="Delete the banner" 
+                        ng-if="!!model.value.media[1].url" 
+                        ng-click="openConfirmRemoveDialog(1)"
+                    ><i class="icon-trash"></i></button>
+                </h3>
+                <a 
+                    class="thumbnail-link"
+                    ng-click="openMediaPicker(1)"
+                >
+                    <img ng-if="!!model.value.media[1].url" class="orc-be-thumbnail" src={{model.value.media[1].url}} />
+                    <i class="icon-add" ng-if="!model.value.media[1].url"></i>
+                </a>
+            </div>
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end row -->
+</div>
+<!-- end orc-banner-editor -->
