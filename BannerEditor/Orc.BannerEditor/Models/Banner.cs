@@ -46,6 +46,9 @@ namespace Orc.BannerEditor.Models
         [JsonProperty("media")]
         public IEnumerable<BannerMedia> Media { get; set; }
 
+        [JsonProperty("overlayColor")]
+        public string OverlayColor { get; set; }
+
         /// <summary>
         /// The sub-headline - Defaults to "Sub-Headline" in the property
         /// </summary>
@@ -112,6 +115,7 @@ namespace Orc.BannerEditor.Models
                 Link = jobj.GetValue("link").ToObject<BannerLink>(),
                 LinkColor = jobj.Value<string>("linkColor"),
                 Media = jobj.GetValue("media") != null ? jobj.Value<JArray>("media").ToObject<List<BannerMedia>>() : null,
+                OverlayColor = jobj.Value<string>("overlayColor"),
                 SubHeadline = jobj.Value<string>("subheadline"),
                 SubHeadlineColor = jobj.Value<string>("subheadlineColor"),
                 Position = jobj.Value<string>("position"),

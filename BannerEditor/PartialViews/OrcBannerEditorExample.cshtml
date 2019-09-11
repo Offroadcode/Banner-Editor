@@ -1,0 +1,156 @@
+@model Orc.BannerEditor.Models.Banner
+@{
+
+    // Use this code to render this partial in your template. Replace "banner" with whatever your property name is
+    // Make sure to include @using TextOverImage.Models at the top of your template
+    //@if(Model.Content.HasProperty("banner") && Model.Content.HasValue("banner"))
+    //{
+    //    @Html.Partial("OrcBannerEditorExample", Model.Content.GetPropertyValue<Banner>("banner")
+    //}
+
+    // You could use banner.Media.GetCropUrl(width,height) here instead if you want to set it!
+    var imageUrl = Model.Media != null ? Model.Media.Url : string.Empty;
+    var headlineStyle = Model.HasHeadlineColor ? MvcHtmlString.Create(" style=\"color: rgba(" + Model.HeadlineColor + ");\"") : MvcHtmlString.Empty;
+    var subHeadlineStyle = Model.HasSubHeadlineColor ? MvcHtmlString.Create(" style=\"color: rgba(" + Model.SubHeadlineColor + ");\"") : MvcHtmlString.Empty;
+    var linkStyle = Model.HasLinkColor ? MvcHtmlString.Create(" style=\"color: rgba(" + Model.LinkColor + ");\"") : MvcHtmlString.Empty;
+    var overlayStyle = Model.HasOverlayColor ? MvcHtmlString.Create(" style=\"background-color: rgba(" + Model.OverlayColor + ");\"") : MvcHtmlString.Empty;;
+}
+
+@* Copy the styles into your own CSS or SASS :) They're in the helper at the bottom *@
+@RenderStyles()
+
+<div class="banner banner--@Model.Height">
+    <div class="banner--inner banner--@Model.Position">
+        <h1@(headlineStyle)>@Model.Headline</h1>
+        <h2@(subHeadlineStyle)>@Model.Subheadline</h2>
+        @if (Model.Link != null)
+        {
+            <a href="@Model.Link.Url" target="@Model.Link.Target" class="button"@linkStyle>@Model.Link.Name</a>
+        }
+    </div>
+    @if (!Model.HasVideo && Model.HasMedia)
+    {
+        <div class="banner--image">
+            <picture>
+                @foreach (var media in Model.Media)
+                {
+                    var dimensions = "(max-width: 600px)";
+                    switch (media.Key)
+                    {
+                        case "desktop":
+                            dimensions = "(min-width: 1200px)";
+                            break;
+                        case "tablet":
+                            dimensions = "(min-width: 600px)";
+                            break;
+                    }
+                    <source srcset="@media.Url" media="@dimensions">
+                }
+                <img src="@Model.Media.FirstOrDefault(x => x.Key == "mobile").Url" alt="MDN">
+            </picture>
+        </div>
+    }
+    else if (Model.HasVideo)
+    {
+        var poster = Model.HasMedia ? MvcHtmlString.Create(" poster=\"" + Model.Media.FirstOrDefault(x => x.HasImage).Url + "\"") : MvcHtmlString.Empty;
+
+        <video autoplay @poster>
+            <source src="@Model.Video.Url" type="video/mp4">
+        </video>
+    }
+    <div class="banner--overlay"@overlayStyle></div>
+</div>
+
+@helper RenderStyles()
+{
+    <style>
+        .banner {
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #708090
+        }
+
+        .banner--tall {
+            height: 100vh;
+        }
+
+        .banner--mid {
+            height: 80vh;
+        }
+
+        .banner--short {
+            height: 50vh;
+        }
+
+        .banner--inner {
+            position: absolute;
+            display: inline-block;
+            top: 0;
+            left: 0;
+            max-width: 90%;
+            color: white;
+            text-shadow: 0 0 5px black;
+        }
+
+        .banner--tl {
+            left: 5%;
+            top: 5%;
+        }
+
+        .banner--tc {
+            top: 5%;
+            left: 5%;
+            text-align: center;
+            width: 90%;
+        }
+
+        .banner--tr {
+            top: 5%;
+            right: 5%;
+            left: auto;
+            width: auto;
+        }
+
+        .banner--ml {
+            left: 5%;
+            top: calc(33% - 1em);
+        }
+
+        .banner--mc {
+            top: calc(33% - 1em);
+            left: 5%;
+            width: 90%;
+            text-align: center;
+        }
+
+        .banner--mr {
+            top: calc(33% - 1em);
+            left: auto;
+            right: 5%;
+            width: auto;
+        }
+
+        .banner--bl {
+            top: auto;
+            bottom: 5%;
+            left: 5%;
+        }
+
+        .banner--bc {
+            top: auto;
+            left: 5%;
+            bottom: 5%;
+            width: 90%;
+            text-align: center;
+        }
+
+        .banner--br {
+            top: auto;
+            bottom: 5%;
+            left: auto;
+            right: 5%;
+            width: auto;
+        }
+    </style>
+}
