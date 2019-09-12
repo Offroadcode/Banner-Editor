@@ -9,7 +9,6 @@
     //}
 
     // You could use banner.Media.GetCropUrl(width,height) here instead if you want to set it!
-    var imageUrl = Model.Media != null ? Model.Media.Url : string.Empty;
     var headlineStyle = Model.HasHeadlineColor ? MvcHtmlString.Create(" style=\"color: rgba(" + Model.HeadlineColor + ");\"") : MvcHtmlString.Empty;
     var subHeadlineStyle = Model.HasSubHeadlineColor ? MvcHtmlString.Create(" style=\"color: rgba(" + Model.SubHeadlineColor + ");\"") : MvcHtmlString.Empty;
     var linkStyle = Model.HasLinkColor ? MvcHtmlString.Create(" style=\"color: rgba(" + Model.LinkColor + ");\"") : MvcHtmlString.Empty;
@@ -21,8 +20,15 @@
 
 <div class="banner banner--@Model.Height">
     <div class="banner--inner banner--@Model.Position">
-        <h1@(headlineStyle)>@Model.Headline</h1>
-        <h2@(subHeadlineStyle)>@Model.Subheadline</h2>
+        @if (Model.HasHeadline)
+        {
+            <h1@(headlineStyle)>@Model.Headline</h1>
+        }
+        @if (Model.HasSubHeadline)
+        {
+            <h2@(subHeadlineStyle)>@Model.SubHeadline</h2>
+        }
+        
         @if (Model.Link != null)
         {
             <a href="@Model.Link.Url" target="@Model.Link.Target" class="button"@linkStyle>@Model.Link.Name</a>
@@ -44,15 +50,15 @@
                             dimensions = "(min-width: 600px)";
                             break;
                     }
-                    <source srcset="@media.Url" media="@dimensions">
+                    <source srcset="@media.Image.Url" media="@dimensions">
                 }
-                <img src="@Model.Media.FirstOrDefault(x => x.Key == "mobile").Url" alt="MDN">
+                <img src="@Model.Media.FirstOrDefault(x => x.Key == "mobile").Image.Url" alt="MDN">
             </picture>
         </div>
     }
     else if (Model.HasVideo)
     {
-        var poster = Model.HasMedia ? MvcHtmlString.Create(" poster=\"" + Model.Media.FirstOrDefault(x => x.HasImage).Url + "\"") : MvcHtmlString.Empty;
+        var poster = Model.HasMedia ? MvcHtmlString.Create(" poster=\"" + Model.Media.FirstOrDefault(x => x.HasImage).Image.Url + "\"") : MvcHtmlString.Empty;
 
         <video autoplay @poster>
             <source src="@Model.Video.Url" type="video/mp4">
@@ -64,93 +70,130 @@
 @helper RenderStyles()
 {
     <style>
-        .banner {
-            position: relative;
-            width: 100%;
-            box-sizing: border-box;
-            background-color: #708090
+        /* 
+            THIS JUST INCLUDES DESKTOP STYLES. YOU WILL WANT TO TWEAK IT FOR MOBILE BASED ON YOUR OWN NEEDS
+            BUT IT DOES "JUST WORK" FOR THE MOST PART IN THE MEANTIME :)
+        */
+
+        /* Just a couple reset styles */
+        body {
+            margin: 0;
+            padding: 0;
         }
 
+        /* General banner */
+        .banner {
+            position: relative;
+            width: 100vw;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: 33.3% 33.3% 33.3%;
+            grid-template-rows: 33.3% 33.3% 33.3%;
+        }
+
+        /* Banner Image */
+        .banner--image, .banner--overlay {
+            grid-column-start: 1;
+            grid-column-end: 4;
+            grid-row-start: 1;
+            grid-row-end: 4;
+        }
+
+        .banner--image picture {
+        }
+
+        /* This sizes the image that's set in the picture element */
+        .banner--image img {
+            object-fit: cover;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Overlay */
+        .banner--overlay {
+            grid-column-start: 1;
+            grid-column-end: 4;
+            grid-row-start: 1;
+            grid-row-end: 4;
+            z-index: 1;
+        }
+
+        /* Banner Sizing */
+        /* Tall height*/
         .banner--tall {
             height: 100vh;
         }
 
+        /* Mid-height - default! */
         .banner--mid {
             height: 80vh;
         }
 
+        /* Short height */
         .banner--short {
             height: 50vh;
         }
 
+        /* Banner Positioning */
         .banner--inner {
-            position: absolute;
-            display: inline-block;
-            top: 0;
-            left: 0;
-            max-width: 90%;
-            color: white;
-            text-shadow: 0 0 5px black;
+            grid-row-start: 1;
+            grid-column-start: 1;
+            z-index: 2;
         }
 
+        /* Top left */
         .banner--tl {
-            left: 5%;
-            top: 5%;
+            grid-column-start: 1;
         }
 
+        /* Top center */
         .banner--tc {
-            top: 5%;
-            left: 5%;
+            grid-column-start: 1;
+            grid-column-end: 4;
             text-align: center;
-            width: 90%;
         }
 
+        /* Top right */
         .banner--tr {
-            top: 5%;
-            right: 5%;
-            left: auto;
-            width: auto;
+            grid-column-start: 3;
         }
 
+        /* Middle left */
         .banner--ml {
-            left: 5%;
-            top: calc(33% - 1em);
+            grid-row-start: 2;
         }
 
+        /* Middle center - default! */
         .banner--mc {
-            top: calc(33% - 1em);
-            left: 5%;
-            width: 90%;
+            grid-row-start: 2;
+            grid-column-start: 1;
+            grid-column-end: 4;
             text-align: center;
         }
 
+        /* Middle right */
         .banner--mr {
-            top: calc(33% - 1em);
-            left: auto;
-            right: 5%;
-            width: auto;
+            grid-row-start: 2;
+            grid-column-start: 3;
         }
 
+        /* Bottom left */
         .banner--bl {
-            top: auto;
-            bottom: 5%;
-            left: 5%;
+            grid-row-start: 3;
         }
 
+        /* Bottom center */
         .banner--bc {
-            top: auto;
-            left: 5%;
-            bottom: 5%;
-            width: 90%;
+            grid-row-start: 3;
+            grid-column-start: 1;
+            grid-column-end: 4;
             text-align: center;
         }
 
+        /* Bottom right */
         .banner--br {
-            top: auto;
-            bottom: 5%;
-            left: auto;
-            right: 5%;
-            width: auto;
+            grid-row-start: 3;
+            grid-column-start: 3;
         }
     </style>
 }
