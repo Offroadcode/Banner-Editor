@@ -85,6 +85,7 @@ namespace Orc.BannerEditor.Models
         public bool HasLink => Link != null && !Link.Url.IsNullOrWhiteSpace();
         public bool HasLinkColor => !LinkColor.IsNullOrWhiteSpace();
         public bool HasMedia => Media != null && Media.Any(x => x.HasKey && x.Image != null);
+        public bool HasOverlayColor => !OverlayColor.IsNullOrWhiteSpace();
         /// <summary>
         /// Displays false if empty or set to "Sub-Headline"
         /// </summary>
@@ -107,6 +108,20 @@ namespace Orc.BannerEditor.Models
             var jobj = (JObject)JsonConvert.DeserializeObject(json);
             var videoId = jobj.SelectToken("video").Value<int>("id");
 
+            var media = new List<BannerMedia>();
+            if(jobj.GetValue("media") != null)
+            {
+                var jarray = jobj.Value<JArray>("media");
+                foreach(var item in jarray)
+                {
+                    var mediaItem = BannerMedia.Deserialize(item.ToString());
+                    if(mediaItem != null)
+                    {
+                        media.Add(mediaItem);
+                    }
+                }
+            }
+
             return new Banner()
             {
                 Headline = jobj.Value<string>("headline"),
@@ -114,7 +129,7 @@ namespace Orc.BannerEditor.Models
                 Height = jobj.Value<string>("height"),
                 Link = jobj.GetValue("link").ToObject<BannerLink>(),
                 LinkColor = jobj.Value<string>("linkColor"),
-                Media = jobj.GetValue("media") != null ? jobj.Value<JArray>("media").ToObject<List<BannerMedia>>() : null,
+                Media = media,
                 OverlayColor = jobj.Value<string>("overlayColor"),
                 SubHeadline = jobj.Value<string>("subheadline"),
                 SubHeadlineColor = jobj.Value<string>("subheadlineColor"),

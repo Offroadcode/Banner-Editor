@@ -4,3 +4,4 @@ BannerEditor/Orc.BannerEditor/.vs/
 BannerEditor/Orc.BannerEditor/obj/Debug/
 BannerEditor/Orc.BannerEditor/bin/Debug/
 node_modules/
+.sass-cache/

@@ -15,7 +15,7 @@ module.exports = function(grunt) {
           atBegin: true
         },
         dll: {
-          files: ['BannerEditor/Umbraco/BannerEditor/**/*.dll'] ,
+          files: ['BannerEditor/Orc.BannerEditor/**/*.dll'] ,
           tasks: ['copy:dll']
         },
         js: {
@@ -60,7 +60,7 @@ module.exports = function(grunt) {
       copy: {
           dll: {
               cwd: 'BannerEditor/Orc.BannerEditor/bin/debug/',
-              src: 'BannerEditor.dll',
+              src: 'Orc.BannerEditor.dll',
               dest: '<%= dest %>/bin/',
               expand: true
           },
@@ -189,7 +189,7 @@ module.exports = function(grunt) {
     }
     });
   
-    grunt.registerTask('default', ['concat', 'sass:dist', 'copy:html', 'copy:manifest', 'copy:css', 'copy:dll', 'clean:html', 'clean:js', 'clean:sass', 'clean:css', 'clean:cshtml']);
+    grunt.registerTask('default', ['concat', 'sass:dist', 'copy:html', 'copy:cshtml', 'copy:manifest', 'copy:css', 'copy:dll', 'clean:html', 'clean:js', 'clean:sass', 'clean:css', 'clean:cshtml']);
     grunt.registerTask('umbraco', ['clean:tmp', 'default', 'copy:umbraco', 'umbracoPackage', 'clean:tmp']);
   };
   

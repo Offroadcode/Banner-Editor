@@ -1,9 +1,10 @@
 ﻿using Orc.BannerEditor.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 
 namespace Orc.BannerEditor.Converters
 {
-    public class BannerEditorPropertyValueConverter
+    public class BannerEditorPropertyValueConverter : IPropertyValueConverter
     {
         public bool IsConverter(PublishedPropertyType propertyType)
         {

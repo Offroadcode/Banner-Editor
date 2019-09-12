@@ -43,12 +43,12 @@ namespace Orc.BannerEditor.Models
             }
 
             // Deserialize the JSON
-            var jobj = (JProperty)JsonConvert.DeserializeObject(json);
+            var jobj = (JObject)JsonConvert.DeserializeObject(json);
             var mediaId = jobj.Value<int>("id");
 
             return new BannerMedia
             {
-                Key = (string)jobj.Value["key"],
+                Key = jobj.Value<string>("key"),
                 Image = mediaId != 0 ? UmbracoContext.Current.MediaCache.GetById(mediaId) : null
             };
         }
