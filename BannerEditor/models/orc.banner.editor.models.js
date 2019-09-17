@@ -49,11 +49,19 @@
                 self.linkColor = data.linkColor;
             }
 			if (data.media !== undefined) {
-				self.media = [
-                    new bannerEditor.Models.MediaItem(data.media[0]),
-                    new bannerEditor.Models.MediaItem(data.media[1]),
-                    new bannerEditor.Models.MediaItem(data.media[2])
-                ];
+                if (Array.isArray(data.media)) {
+                    self.media = [
+                        new bannerEditor.Models.MediaItem(data.media[0]),
+                        new bannerEditor.Models.MediaItem(data.media[1]),
+                        new bannerEditor.Models.MediaItem(data.media[2])
+                    ];
+                } else {
+                    self.media = [
+                        new bannerEditor.Models.MediaItem(data.media),
+                        new bannerEditor.Models.MediaItem(),
+                        new bannerEditor.Models.MediaItem()
+                    ];
+                }
             }
             if (data.overlayColor !== undefined) {
                 self.overlayColor = data.overlayColor;

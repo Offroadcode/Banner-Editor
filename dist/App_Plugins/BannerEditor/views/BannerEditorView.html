@@ -4,20 +4,59 @@
     class="text-over-image orc-be orc-be-{{model.alias}}" 
 >
     <div ng-if="!hasImageSelected()">
-        <button ng-click="openMediaPicker(0)" type="button" class="btn">Select Image</button> or <button type="button" class="btn" ng-click="showBannerWithoutImage()">Add Text</button>
+        <button ng-click="openMediaPicker(0)" 
+            type="button" 
+            class="btn"
+        >Select Image or Video</button> or <button type="button" class="btn" ng-click="showBannerWithoutImage()">Add Text</button>
     </div>
     <!-- row -->
     <div class="orc-be-row">
         <!-- col -->
-        <div class="image orc-be-col orc-be-col-main" ng-class="getImageWrapperClasses()" ng-if="hasImageSelected()" ng-style="getBackgroundStyle()">
+        <div 
+            class="image orc-be-col orc-be-col-main" 
+            ng-class="getImageWrapperClasses()" 
+            ng-if="hasImageSelected()"
+            ng-style="getBackgroundStyle()"
+        >
+            <video
+                controls
+                ng-if="!!model.value.video.url"
+                class="orc-be-thumbnail orc-be-video-{{model.value.video.id}}"
+            >        
+                    <source
+                    ng-if="model.value.video.url.indexOf('.mp4') > -1"
+                    src={{model.value.video.url}}
+                    type="video/mp4"
+                >                     
+                Sorry, your browser doesn't support embedded videos.
+            </video> 
             <div class="color-overlay-preview" style="background: rgba({{model.value.overlayColor}})">
+
+               
                 <div class="overlay pos-{{model.value.position}}">
                         <div class="headline-wrapper">
-                            <h1 contenteditable="true" ng-model="model.value.headline">{{model.value.headline}}</h1>
+                            <h1 
+                                contenteditable="true" 
+                                ng-model="model.value.headline"
+                                ng-style="getHeadlineColorStyle()"
+                            >{{model.value.headline}}</h1>
+                            <h1 
+                                ng-if="!model.value.headline || model.value.headline == '<br>'"
+                                class="headline-placeholder"
+                            >Headline</h1>
                             <div class="pickr-container-headlineColor" ng-init="createColorPicker('headlineColor')"></div>
                         </div>
                         <div ng-if="model.config.showSubHeadline" class="subheadline-wrapper"> 
-                            <p contenteditable="true" ng-model="model.value.subheadline">{{model.value.subheadline}}</p>
+                            <p 
+                                class="subheadline" 
+                                contenteditable="true" 
+                                ng-model="model.value.subheadline"
+                                ng-style="getSubheadlineColorStyle()"
+                            >{{model.value.subheadline}}</p>
+                            <p 
+                                ng-if="!model.value.subheadline || model.value.subheadline == '<br>'"
+                                class="subheadline-placeholder"
+                            >Sub-Headline</p>
                             <div class="pickr-container-subheadlineColor" ng-init="createColorPicker('subheadlineColor')"></div>
                         </div>
                         <div ng-if="model.config.showLink" class="link-wrapper">
@@ -48,7 +87,7 @@
                 <button type="button" class="grid-br" ng-click="changePos('br')"></button>
             </div>
             <div class="settings">
-                <button type="button" class="btn btn-small" title="Overlay Color" ng-click="openOverlayPicker()"><i class="icon-brush"></i></button>
+                <button type="button" class="btn btn-small" title="Add or Edit Color Overlay" ng-click="openOverlayPicker()"><i class="icon-brush"></i></button>
                 <button type="button" class="btn btn-small" title="Resize: Medium, Tall, or Short" ng-click="changeHeight()"><i class="icon-navigation-vertical"></i></button>
                 <button type="button" class="btn btn-small" ng-click="toggleMode()" title="Position your text"><i class="icon-thumbnails-small"></i></button>
                 <button type="button" class="btn btn-small" ng-click="openMediaPicker()" title="Select an image"><i class="icon-umb-media"></i></button>
@@ -61,12 +100,30 @@
         <!-- end col -->
         <!-- col -->
         <div class="orc-be-col orc-be-col-sidebar" ng-if="hasImageSelected()">
+            <div class="preview poster" ng-if="model.value.video.url">
+                <h3>Poster
+                        <button 
+                        type="button" 
+                        class="btn btn-small btn-danger" 
+                        title="Delete the mobile image" 
+                        ng-if="!!model.value.media[0].url" 
+                        ng-click="openConfirmRemoveDialog(0)"
+                    ><i class="icon-trash"></i></button>
+                </h3>
+                <a
+                    class="thumbnail-link" 
+                    ng-click="openMediaPicker(0)"
+                >
+                    <img ng-if="!!model.value.media[0].url" class="orc-be-thumbnail" src={{model.value.media[0].url}} />
+                    <i class="icon-add" ng-if="!model.value.media[0].url"></i>
+                </a>
+            </div>
             <div class="preview size-mobile">
                 <h3>Mobile
                     <button 
                         type="button" 
                         class="btn btn-small btn-danger" 
-                        title="Delete the banner" 
+                        title="Delete the mobile image" 
                         ng-if="!!model.value.media[2].url" 
                         ng-click="openConfirmRemoveDialog(2)"
                     ><i class="icon-trash"></i></button>
@@ -84,7 +141,7 @@
                     <button 
                         type="button" 
                         class="btn btn-small btn-danger" 
-                        title="Delete the banner" 
+                        title="Delete the tablet image" 
                         ng-if="!!model.value.media[1].url" 
                         ng-click="openConfirmRemoveDialog(1)"
                     ><i class="icon-trash"></i></button>

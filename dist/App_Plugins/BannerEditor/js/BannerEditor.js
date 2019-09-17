@@ -30,7 +30,7 @@
 	*/
 	models.BannerEditor = function(data) {
 		var self = this;
-        self.headline = "Headline";
+        self.headline = "";
         self.headlineColor = "";
 		self.height = "mid";
         self.link = new bannerEditor.Models.Link();
@@ -42,7 +42,7 @@
         ];
         self.overlayColor = "";
         self.position = "mc";
-        self.subheadline = "Sub-Headline";
+        self.subheadline = "";
         self.subheadlineColor = "";
         self.video = new bannerEditor.Models.Video();
 		if (data !== undefined) {
@@ -62,11 +62,19 @@
                 self.linkColor = data.linkColor;
             }
 			if (data.media !== undefined) {
-				self.media = [
-                    new bannerEditor.Models.MediaItem(data.media[0]),
-                    new bannerEditor.Models.MediaItem(data.media[1]),
-                    new bannerEditor.Models.MediaItem(data.media[2])
-                ];
+                if (Array.isArray(data.media)) {
+                    self.media = [
+                        new bannerEditor.Models.MediaItem(data.media[0]),
+                        new bannerEditor.Models.MediaItem(data.media[1]),
+                        new bannerEditor.Models.MediaItem(data.media[2])
+                    ];
+                } else {
+                    self.media = [
+                        new bannerEditor.Models.MediaItem(data.media),
+                        new bannerEditor.Models.MediaItem(),
+                        new bannerEditor.Models.MediaItem()
+                    ];
+                }
             }
             if (data.overlayColor !== undefined) {
                 self.overlayColor = data.overlayColor;
@@ -210,7 +218,7 @@ angular.module('umbraco').controller('confirmation.dialog.controller',
     	}
     });
 
-angular.module("umbraco").controller("orc.banner.editor.controller", function($scope, dialogService) {
+angular.module("umbraco").controller("orc.banner.editor.controller", function($scope, dialogService, notificationsService) {
 
 	// Initialization Methods ////////////////////////////////////////////////////
 
@@ -220,7 +228,6 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     * initialization functions.
 	*/
 	$scope.init = function() {
-        console.info($scope.model);
         $scope.setVariables();
 	};
 
@@ -232,7 +239,8 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
         $scope.model.value = $scope.getPropertyValue();
         $scope.maxWidth = $scope.getMaxWidth();
 		$scope.propertyEditorMode = "edit";
-		$scope.shouldShowBannerWithoutImage = false;
+        $scope.shouldShowBannerWithoutImage = false;
+        $scope.pointlessPing = 0;
     };
 
 	// Event Handler Methods /////////////////////////////////////////////////////
@@ -316,6 +324,39 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
         $scope.model.value.link.url = '';        
     };
 
+    $scope.getHeadlineColorStyle = function() {
+        var styles = {};
+        if ($scope.model.value.headlineColor) {
+            styles = {
+                color: "rgba(" + $scope.model.value.headlineColor + ")"
+            };
+        } else {
+            if (!!$scope.model.value.headline && $scope.model.value.headline !== '<br>') {
+                styles = {
+                    background: "rgba(255,255,255, .8)"
+                };
+            }
+        }
+        return styles; 
+    }
+
+    $scope.getSubheadlineColorStyle = function() { 
+        var styles = {};
+        if ($scope.model.value.subheadlineColor) {
+            styles = {
+                color: "rgba(" + $scope.model.value.subheadlineColor + ")"
+            };
+        } else {
+            if (!!$scope.model.value.subheadline && $scope.model.value.subheadline !== '<br>') {
+                styles = {
+                    background: "rgba(255,255,255, .8)"
+                };
+            }
+        }
+        return styles; 
+
+    }
+
     /**
     * @method $scope.handleMediaPickerSelection
     * @param {Object} data - modal object returned by dialogService.mediaPicker().
@@ -324,27 +365,63 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     */
     $scope.handleMediaPickerSelection = function(data, index) {
         if (data && data.id && !!data.image) {
-            var media = $scope.getMediaClone($scope.model.value.media);
-            media[index].id = data.id;
-            media[index].url = data.image;
-            media[index].width = data.originalWidth;
-            media[index].height = data.originalHeight;
-            media[index].altText = data.name;
-            $scope.shouldShowBannerWithoutImage = true;
-            if (data.properties) {
-                data.properties.forEach(function(property) {
-                    if(property.alias == "altText") {
-                        if(property.value != "") {
-                            media[0].altText = property.value;
+            const isVideo = data.image.indexOf('.mp4') > -1;
+            if (isVideo && index == 0) {
+                $scope.handleMediaPickerForVideoSelection(data);
+            } else {
+                var media = $scope.getMediaClone($scope.model.value.media);
+                media[index].id = data.id;
+                media[index].url = data.image;
+                media[index].width = data.originalWidth;
+                media[index].height = data.originalHeight;
+                media[index].altText = data.name;
+                //$scope.shouldShowBannerWithoutImage = true;
+                if (data.properties) {
+                    data.properties.forEach(function(property) {
+                        if(property.alias == "altText") {
+                            if(property.value != "") {
+                                media[0].altText = property.value;
+                            }
                         }
+                    });
+                } else if (!!data.metaData) {
+                    if (!!data.metaData.Text) {
+                        media[index].altText = data.metaData.Text;
                     }
-                });
-            } else if (!!data.metaData) {
-                if (!!data.metaData.Text) {
-                    media[index].altText = data.metaData.Text;
+                }
+                $scope.model.value.media = media;
+                if (index == 0) {
+                    window.setTimeout(function() {
+                        document.querySelector('.orc-be-media-item-sizer-' + data.id).onload = function() {
+                            $scope.$apply(function() {
+                                $scope.pointlessPing++;
+                            });
+                        }
+                    }, 100);                    
                 }
             }
-            $scope.model.value.media = media;
+        }
+    };
+
+    $scope.handleMediaPickerForVideoSelection = function(data) {
+        if (data && data.id && !!data.image) {
+            const isVideo = data.image.indexOf('.mp4') > -1;
+            if (isVideo) {
+                $scope.model.value.video = new bannerEditor.Models.Video({
+                    id: data.id,
+                    name: data.name,
+                    url: data.image
+                });
+                window.setTimeout(function() {
+                    document.querySelector('.orc-be-video-' + data.id).onloadedmetadata = function() {
+                        $scope.$apply(function() {
+                            $scope.pointlessPing++;
+                        });
+                    }
+                }, 100);
+            } else {
+                notificationsService.error("Incorrect Video Format", "You can only select videos with the .mp4 format for use with the banner editor.");
+            }
         }
     };
 
@@ -370,15 +447,20 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
 	*/
 	$scope.onRemoveImageConfirmation = function(index) {
         var media = $scope.getMediaClone($scope.model.value.media);
-        var key = "desktop";
-        switch (index) {
-            case 1:
-                key = "tablet";
-            case 2:
-                key = "mobile";
+        var video = new bannerEditor.Models.Video($scope.model.value.video);
+        if (index < 0 || (index == 0 && !!video.url)) {
+            $scope.model.value.video = new bannerEditor.Models.Video();
+        } else {
+            var key = "desktop";
+            switch (index) {
+                case 1:
+                    key = "tablet";
+                case 2:
+                    key = "mobile";
+            }
+            media[index] = new bannerEditor.Models.MediaItem({key: key});
+            $scope.model.value.media = media;
         }
-        media[index] = new bannerEditor.Models.MediaItem({key: key});
-		$scope.model.value.media = media;
     };
     
 	/**
@@ -391,7 +473,7 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
         dialogService.open({
 			template: "/App_plugins/BannerEditor/views/ConfirmationDialogView.html",
 			dialogData: {
-                message: "Are you sure you want to remove the selected image?"
+                message: "Are you sure you want to remove the selected " + (index > -1 ? "image?" : "video?")
 			},
 			callback: function() {
                 $scope.onRemoveImageConfirmation(index);
@@ -413,6 +495,16 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
         };
         dialogService.mediaPicker(options);
     };
+
+    $scope.openMediaPickerForVideo = function(index) {
+        var options = {
+            onlyImages: false,
+            callback: function(data) {
+                $scope.handleMediaPickerForVideoSelection(data);
+            }
+        };
+        dialogService.mediaPicker(options);
+    }
 
 	/**
     * @method openLinkPicker
@@ -489,16 +581,29 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
         var styles = {
             width: "800px",
             height: "400px",
-            background: "#333"
+            background: "#333",
+            position: "relative",
+            display: "block",
+            overflow: "hidden"
         };
         var media = $scope.getMediaClone($scope.model.value.media);
+        var video = new bannerEditor.Models.Video($scope.model.value.video);
         var mediaItem = media[0];
 
-        if (mediaItem.url !== "") {
+        if (mediaItem.url !== "" || video.url !== "") {
+            var width = 0;
+            var height = 0;
             // 1. Get natural dimensions
-            var sizer = document.querySelector('.orc-be-media-item-sizer-' + mediaItem.id);
-            width = !!sizer ? sizer.naturalWidth : mediaItem.width;
-            height = !!sizer ? sizer.naturalHeight : mediaItem.height;
+            if (video.url) {
+                var videoSizer = document.querySelector('.orc-be-video-' + $scope.model.value.video.id);
+                width = !!videoSizer ? videoSizer.videoWidth : 800;
+                height = !!videoSizer ? videoSizer.videoHeight : 400;
+            } else if (mediaItem.url) {
+                var sizer = document.querySelector('.orc-be-media-item-sizer-' + mediaItem.id);
+                width = !!sizer ? sizer.naturalWidth : mediaItem.width;
+                height = !!sizer ? sizer.naturalHeight : mediaItem.height;
+            }
+
             var ratio = height / width;
 
             // 2. Adjust for selected height type.
@@ -525,9 +630,13 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
                 width: width + "px",
                 height: height + "px",
                 background: "url(" + mediaItem.url + ") center center no-repeat",
-                'background-size': "cover"
+                'background-size': "cover",
+                position: "relative",
+                display: "block",
+                overflow: "hidden"         
             };
-        }
+        } 
+        
         return styles;
     };
 
@@ -623,7 +732,10 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
             if (mediaItem.id != 0) {
                 hasImageSelected = true;
             }
-			if (($scope.model.value.headline !== "" && $scope.model.value.headline !== "Headline") || ($scope.model.value.subheadline !== "" && $scope.model.value.subheadline !== "Sub-Headline")) {
+            if ($scope.model.value.video.id !== 0) {
+                hasImageSelected = true;
+            }
+			if ((!!$scope.model.value.headline && $scope.model.value.headline !== '<br>') || (!!$scope.model.value.subheadline && $scope.model.value.subheadline !== '<br>')) {
 				hasImageSelected = true;
 			}
         }

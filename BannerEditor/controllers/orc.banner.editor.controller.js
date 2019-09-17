@@ -8,7 +8,6 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     * initialization functions.
 	*/
 	$scope.init = function() {
-        console.info($scope.model);
         $scope.setVariables();
 	};
 
