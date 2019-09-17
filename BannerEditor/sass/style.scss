@@ -29,11 +29,26 @@
             display: inline-block;
             padding: 5px;
             vertical-align: top;
-            background: rgba(white, .8);
             float: left;
+            min-height: 1em;
+        }
+        p {
+            min-height: 30px;
         }
         h1 {
             margin-bottom: 5px;
+        }
+        .headline-placeholder,
+        .subheadline-placeholder {
+            position: absolute;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+            background: rgba(white, .8);
+        }
+        h1:focus + .headline-placeholder,
+        p:focus + .subheadline-placeholder {
+            display: none;
         }
         p {
             clear: both;
@@ -216,16 +231,18 @@
                 color: white; 
             }
         }
-        .orc-be-thumbnail {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
 
-        }
     }
+
+    .orc-be-thumbnail {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+
+    }    
 
     .headline-wrapper {
         position: relative;
@@ -273,6 +290,10 @@
         top: 0;
         width: 100%;
         height: 100%;
+        pointer-events: none;
+        * {
+            pointer-events: all;
+        }
     }
 
 }

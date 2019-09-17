@@ -17,7 +17,7 @@
 	*/
 	models.BannerEditor = function(data) {
 		var self = this;
-        self.headline = "Headline";
+        self.headline = "";
         self.headlineColor = "";
 		self.height = "mid";
         self.link = new bannerEditor.Models.Link();
@@ -29,7 +29,7 @@
         ];
         self.overlayColor = "";
         self.position = "mc";
-        self.subheadline = "Sub-Headline";
+        self.subheadline = "";
         self.subheadlineColor = "";
         self.video = new bannerEditor.Models.Video();
 		if (data !== undefined) {
