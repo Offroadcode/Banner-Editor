@@ -89,7 +89,6 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
             }
             $scope.$apply(function() {
                 $scope.model.value[key] = newColor;
-                console.info($scope.model.value);
             });
         });
         if (key == "overlayColor") {
@@ -268,7 +267,7 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
     */
     $scope.openMediaPicker = function(index) {
         var options = {
-            onlyImages: true,
+            onlyImages: false,
             callback: function(data) {
                 $scope.handleMediaPickerSelection(data, index);
             }
