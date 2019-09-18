@@ -60,7 +60,8 @@
     {
         var poster = Model.HasMedia ? MvcHtmlString.Create(" poster=\"" + Model.Media.FirstOrDefault(x => x.HasImage).Image.Url + "\"") : MvcHtmlString.Empty;
 
-        <video autoplay @poster>
+        @* Most browsers will not let videos autoplay unless they're muted, so make sure you leave that on if you want an autoplaying background video! *@
+        <video autoplay muted loop class="banner--video"@poster>
             <source src="@Model.Video.Url" type="video/mp4">
         </video>
     }
@@ -92,14 +93,11 @@
         }
 
         /* Banner Image */
-        .banner--image, .banner--overlay {
+        .banner--image, .banner--overlay, .banner--video {
             grid-column-start: 1;
             grid-column-end: 4;
             grid-row-start: 1;
             grid-row-end: 4;
-        }
-
-        .banner--image picture {
         }
 
         /* This sizes the image that's set in the picture element */
@@ -107,6 +105,13 @@
             object-fit: cover;
             height: 100%;
             width: 100%;
+        }
+
+        /* Video specific styles */
+        .banner--video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         /* Overlay */
