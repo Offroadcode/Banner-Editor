@@ -58,10 +58,13 @@
                 } else {
                     self.media = [
                         new bannerEditor.Models.MediaItem(data.media),
-                        new bannerEditor.Models.MediaItem(),
-                        new bannerEditor.Models.MediaItem()
+                        new bannerEditor.Models.MediaItem({key: "tablet"}),
+                        new bannerEditor.Models.MediaItem({key: "mobile"})
                     ];
                 }
+                self.media[0].key = !!self.media[0].key ? self.media[0].key : "desktop";
+                self.media[1].key = !!self.media[1].key ? self.media[1].key : "tablet";
+                self.media[2].key = !!self.media[2].key ? self.media[2].key : "mobile";
             }
             if (data.overlayColor !== undefined) {
                 self.overlayColor = data.overlayColor;
