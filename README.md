@@ -9,6 +9,12 @@ A responsive image banner editor package for Umbraco.
 
 ### Build
 
+#### Initial Build
+
+Before you can do the initial build, you'll need to open the **Orc.BannerEditor.sln** file, restore the nuget packages, and build. This version of the Umbraco package builder does not use grunt's MSBuild due to errors, so the C# needs to be handled in Visual Studio.
+
+#### Continued Build/Post Initial C# Build
+
     grunt
 
 Builds the project to /dist/. These files can be dropped into an Umbraco 7 site, or you can build directly to a site using:
