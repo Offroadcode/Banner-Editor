@@ -71,10 +71,13 @@
                 } else {
                     self.media = [
                         new bannerEditor.Models.MediaItem(data.media),
-                        new bannerEditor.Models.MediaItem(),
-                        new bannerEditor.Models.MediaItem()
+                        new bannerEditor.Models.MediaItem({key: "tablet"}),
+                        new bannerEditor.Models.MediaItem({key: "mobile"})
                     ];
                 }
+                self.media[0].key = !!self.media[0].key ? self.media[0].key : "desktop";
+                self.media[1].key = !!self.media[1].key ? self.media[1].key : "tablet";
+                self.media[2].key = !!self.media[2].key ? self.media[2].key : "mobile";
             }
             if (data.overlayColor !== undefined) {
                 self.overlayColor = data.overlayColor;
@@ -617,12 +620,12 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
                     height = 600;
                     break;
             }
-            width = height / ratio; 
+            //width = height / ratio; 
 
             // 3. Fix if too wide for container.
             if (width > $scope.maxWidth) {
                 width = $scope.maxWidth;
-                height = ratio * width;
+                //height = ratio * width;
             }
 
             styles = {
