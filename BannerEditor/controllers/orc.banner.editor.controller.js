@@ -397,12 +397,12 @@ angular.module("umbraco").controller("orc.banner.editor.controller", function($s
                     height = 600;
                     break;
             }
-            width = height / ratio; 
+            //width = height / ratio; 
 
             // 3. Fix if too wide for container.
             if (width > $scope.maxWidth) {
                 width = $scope.maxWidth;
-                height = ratio * width;
+                //height = ratio * width;
             }
 
             styles = {
