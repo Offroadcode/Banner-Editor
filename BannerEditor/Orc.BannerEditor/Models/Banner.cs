@@ -10,6 +10,11 @@ namespace Orc.BannerEditor.Models
 {
     public class Banner
     {
+        public Banner()
+        {
+            Media = new List<BannerMedia>();
+        }
+
         /// <summary>
         /// The headline - Defaults to "Headline" in the property
         /// </summary>
@@ -44,7 +49,7 @@ namespace Orc.BannerEditor.Models
         /// A set of media items for 
         /// </summary>
         [JsonProperty("media")]
-        public IEnumerable<BannerMedia> Media { get; set; }
+        public List<BannerMedia> Media { get; set; }
 
         [JsonProperty("overlayColor")]
         public string OverlayColor { get; set; }
@@ -84,7 +89,7 @@ namespace Orc.BannerEditor.Models
         public bool HasHeight => !Height.IsNullOrWhiteSpace();
         public bool HasLink => Link != null && !Link.Url.IsNullOrWhiteSpace();
         public bool HasLinkColor => !LinkColor.IsNullOrWhiteSpace();
-        public bool HasMedia => Media != null && Media.Any(x => x.HasKey && x.Image != null);
+        public bool HasMedia => Media != null && Media.Any(x => x.Image != null);
         public bool HasOverlayColor => !OverlayColor.IsNullOrWhiteSpace();
         /// <summary>
         /// Displays false if empty or set to "Sub-Headline"
@@ -106,18 +111,34 @@ namespace Orc.BannerEditor.Models
 
             // Deserialize the JSON
             var jobj = (JObject)JsonConvert.DeserializeObject(json);
-            var videoId = jobj.SelectToken("video").Value<int>("id");
+            int videoId = 0;
+            if(jobj["video"] != null && jobj["video"].HasValues)
+            {
+                videoId = jobj.SelectToken("video").Value<int>("id");
+            }
 
             var media = new List<BannerMedia>();
-            if(jobj.GetValue("media") != null)
+            var jmedia = jobj["media"] != null ? jobj.GetValue("media") : null;
+            if (jmedia != null)
             {
-                var jarray = jobj.Value<JArray>("media");
-                foreach(var item in jarray)
+                if(jmedia.GetType() == typeof(JObject))
                 {
-                    var mediaItem = BannerMedia.Deserialize(item.ToString());
+                    var mediaItem = BannerMedia.Deserialize(jmedia.ToString());
                     if(mediaItem != null)
                     {
                         media.Add(mediaItem);
+                    }
+                }
+                else if(jmedia.GetType() == typeof(JArray))
+                {
+                    var jarray = jobj.Value<JArray>("media");
+                    foreach (var item in jarray)
+                    {
+                        var mediaItem = BannerMedia.Deserialize(item.ToString());
+                        if (mediaItem != null)
+                        {
+                            media.Add(mediaItem);
+                        }
                     }
                 }
             }
