@@ -213,6 +213,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\BannerEditorPropertyValueConverter.cs" />
+    <Compile Include="Helpers\ConversionHelpers.cs" />
     <Compile Include="Models\Banner.cs" />
     <Compile Include="Models\BannerLink.cs" />
     <Compile Include="Models\BannerMedia.cs" />

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Orc.BannerEditor.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
@@ -146,14 +147,14 @@ namespace Orc.BannerEditor.Models
             return new Banner()
             {
                 Headline = jobj.Value<string>("headline"),
-                HeadlineColor = jobj.Value<string>("headlineColor"),
+                HeadlineColor = ConversionHelpers.RoundColorNumber(jobj.Value<string>("headlineColor")),
                 Height = jobj.Value<string>("height"),
                 Link = jobj.GetValue("link").ToObject<BannerLink>(),
-                LinkColor = jobj.Value<string>("linkColor"),
+                LinkColor = ConversionHelpers.RoundColorNumber(jobj.Value<string>("linkColor")),
                 Media = media,
-                OverlayColor = jobj.Value<string>("overlayColor"),
+                OverlayColor = ConversionHelpers.RoundColorNumber(jobj.Value<string>("overlayColor")),
                 SubHeadline = jobj.Value<string>("subheadline"),
-                SubHeadlineColor = jobj.Value<string>("subheadlineColor"),
+                SubHeadlineColor = ConversionHelpers.RoundColorNumber(jobj.Value<string>("subheadlineColor")),
                 Position = jobj.Value<string>("position"),
                 Video = videoId != 0 ? UmbracoContext.Current.MediaCache.GetById(videoId) : null
             };
